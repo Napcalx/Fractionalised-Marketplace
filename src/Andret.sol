@@ -9,7 +9,7 @@ contract Andret is ERC721("Tauri", "TNFT") {
     error ERC721IncorrectOwner();
     error ERC721InsufficientApproval();
 
-    mapping(uint256 tokenId => address) private _owners;
+    // mapping(uint256 tokenId => address) _ownerOf;
     mapping(address owner => uint256) private _balances;
 
     mapping(uint256 tokenId => address) private _tokenApprovals;
@@ -20,10 +20,6 @@ contract Andret is ERC721("Tauri", "TNFT") {
         uint256 id
     ) public view virtual override returns(string memory) {
         return "base-marketplace";
-    }
-
-    function _ownerOf(uint256 tokenId) internal view virtual returns (address) {
-        return _owners[tokenId];
     }
     
     function mint(
@@ -66,7 +62,7 @@ contract Andret is ERC721("Tauri", "TNFT") {
     }
 
     function _update(address to, uint256 tokenId, address auth) internal virtual returns (address) {
-        address from = _ownerOf(tokenId);
+        address from = ownerOf(tokenId);
 
         // Perform (optional) operator check
         if (auth != address(0)) {
@@ -78,9 +74,7 @@ contract Andret is ERC721("Tauri", "TNFT") {
             // Clear approval. No need to re-authorize or emit the Approval event
             _approve(address(0), tokenId, address(0));
 
-            unchecked {
-                _balances[from] -= 1;
-            }
+            unchecked {_balances[from] -= 1;}
         }
 
         if (to != address(0)) {
@@ -89,7 +83,7 @@ contract Andret is ERC721("Tauri", "TNFT") {
             }
         }
 
-        _owners[tokenId] = to;
+        _ownerOf[tokenId] = to;
 
         emit Transfer(from, to, tokenId);
 
