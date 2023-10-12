@@ -52,10 +52,11 @@ contract Marketplace {
         require(listing.fractionsAvailable >= _fractionsToPurchase, "Not enough fractions available");
         uint256 cost = (_fractionsToPurchase * listing.totalFractions) / listing.fractionsAvailable;
         uint256 fee = (cost * feePercent) / 10000; // 0.1% fee
+    
 
-        payable(seller).transferFrom(msg.sender, address(this), cost + fee);
-        payable(msg.sender).transfer(msg.value, fee);
-        Andret.transferFrom(address(this), msg.sender, listing.tokenId);
+        listing.seller.call{value: cost + fee}("");
+        listing.seller.call{value: fee}("");
+        _Andret.transferFrom(address(this), msg.sender, listing.tokenId);
         Fractions[_Id][msg.sender] += _fractionsToPurchase;
         listing.fractionsAvailable -= _fractionsToPurchase;
         emit FractionPurchased(_Id, msg.sender, _fractionsToPurchase);
